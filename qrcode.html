@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>On Air Marker – QR Code Installazione App</title>
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#111;--panel:#1c1c1e;--line:#2c2c2e;--text:#f2f2f7;--muted:#8e8e93;--accent:#ff3b30}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:24px 16px 60px}
+.wrap{max-width:680px;margin:0 auto}
+.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.top-nav a{color:var(--text);text-decoration:none;background:var(--panel);border:1px solid #3a3a3c;padding:9px 14px;border-radius:10px;font-weight:600;font-size:13.5px}
+.setup-box{background:var(--panel);border:1px solid #3a3a3c;border-radius:16px;padding:18px;margin-bottom:22px}
+.setup-box h2{margin:0 0 8px;font-size:16px;display:flex;align-items:center;gap:8px}
+.setup-box p{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+.url-row{display:flex;gap:8px;flex-wrap:wrap}
+.url-row input{flex:1;min-width:220px;background:#000;border:1px solid #3a3a3c;color:#fff;padding:11px 13px;border-radius:10px;font:inherit;font-size:14px}
+.url-row input:focus{outline:2px solid var(--accent);border-color:transparent}
+.btn{border:0;background:var(--accent);color:#fff;font:inherit;font-weight:600;padding:11px 16px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.btn.sec{background:#2c2c2e;color:var(--text)}
+.deploy-tips{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.deploy-tips strong{color:var(--text)}
+.deploy-tips a{color:#ff6961}
+
+/* SCHEDA STAMPABILE / QR POSTER */
+.poster{background:var(--panel);border:1px solid #3a3a3c;border-radius:22px;padding:32px 24px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:10px}
+.brand img{width:52px;height:52px;border-radius:12px}
+.brand-text{text-align:left}
+.brand-text h1{margin:0;font-size:24px;line-height:1.15}
+.brand-text span{font-size:13px;color:var(--muted)}
+.poster-sub{font-size:16px;color:var(--text);margin:8px 0 20px;font-weight:500}
+.qr-frame{background:#fff;padding:18px;border-radius:20px;display:inline-block;box-shadow:0 8px 25px rgba(0,0,0,.35)}
+.qr-frame svg{display:block;width:260px;height:260px}
+.qr-link-display{margin:14px auto 22px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;color:var(--muted);background:#000;display:inline-block;padding:7px 14px;border-radius:8px;max-width:100%;word-break:break-all}
+.warn-local{background:rgba(255,159,10,.15);border:1px solid rgba(255,159,10,.5);color:#ffd60a;padding:10px 14px;border-radius:10px;font-size:13px;margin:0 auto 18px;max-width:480px}
+
+.steps-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:left;margin-top:10px}
+@media(max-width:540px){.steps-grid{grid-template-columns:1fr}}
+.step-card{background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.step-card h3{margin:0 0 8px;font-size:14.5px;display:flex;align-items:center;gap:6px}
+.step-card ol{margin:0;padding-left:18px;font-size:13px;color:#d1d1d6}
+.step-card li{margin:5px 0}
+
+.actions-bar{display:flex;justify-content:center;gap:10px;margin-top:24px;flex-wrap:wrap}
+
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  .no-print{display:none!important}
+  .poster{background:#fff;border:2px solid #000;box-shadow:none;color:#000}
+  .brand-text span,.poster-sub,.step-card ol{color:#222}
+  .qr-frame{border:2px solid #000;box-shadow:none}
+  .qr-link-display{background:#f2f2f7;color:#000;border:1px solid #ccc}
+  .step-card{background:#fafafa;border:1px solid #ccc;color:#000}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-nav no-print">
+    <a href="index.html">← Torna a On Air Marker</a>
+    <div style="display:flex;gap:8px">
+      <button class="btn sec" id="btnDownloadPng">⬇️ Scarica QR (PNG)</button>
+      <button class="btn" onclick="window.print()">🖨️ Stampa Scheda QR</button>
+    </div>
+  </div>
+
+  <div class="setup-box no-print">
+    <h2>🔗 Indirizzo Web dell'App (per il QR Code)</h2>
+    <p>Se apri questa pagina dal sito online, il link viene rilevato in automatico. Se la stai preparando dal PC, incolla qui sotto l'indirizzo HTTPS dove hai caricato la cartella:</p>
+    <div class="url-row">
+      <input type="url" id="urlInput" placeholder="https://tuonome.github.io/onair-marker/?install=1">
+      <button class="btn sec" id="btnCopyUrl">Copia link</button>
+    </div>
+    <div class="deploy-tips" id="deployTips">
+      <strong>💡 Non hai ancora messo la cartella online? Ci vogliono 30 secondi (gratis):</strong><br>
+      1. <strong>Metodo immediato (Drag &amp; Drop):</strong> Vai su <a href="https://app.netlify.com/drop" target="_blank" rel="noopener">app.netlify.com/drop</a> e trascina il file <code>onair-marker-deploy.zip</code> (o l'intera cartella <code>onair-marker</code>). Otterrai subito un link <code>https://....netlify.app</code> da incollare qui sopra.<br>
+      2. <strong>Sul vostro sito web:</strong> Carica la cartella <code>onair-marker</code> via FTP sul vostro sito (es. <code>https://onairmilano.tv/marker/</code>).
+    </div>
+  </div>
+
+  <!-- POSTER QR CODE -->
+  <div class="poster">
+    <div class="brand">
+      <img src="icon-192.png" alt="On Air Marker">
+      <div class="brand-text">
+        <h1>On Air Marker</h1>
+        <span>Tracking Marker &amp; Screen Lock per VFX</span>
+      </div>
+    </div>
+
+    <div class="poster-sub">Inquadra il QR Code con la fotocamera del telefono per installare l'app</div>
+
+    <div id="localWarn" class="warn-local no-print" style="display:none">
+      ⚠️ <strong>Attenzione:</strong> stai visualizzando un indirizzo locale. Incolla qui sopra il link <code>https://...</code> pubblico prima di stampare o far inquadrare il QR Code dal telefono!
+    </div>
+
+    <div class="qr-frame" id="qrContainer"></div>
+    <br>
+    <div class="qr-link-display" id="qrText"></div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <h3>🤖 Android (Chrome)</h3>
+        <ol>
+          <li>Inquadra il QR Code e apri il link</li>
+          <li>Tocca il pulsante rosso <strong>«📲 Installa App ora»</strong> che appare in alto (oppure menu <strong>⋮ → Installa app</strong>)</li>
+          <li>Aprila dall'icona <strong>Marker</strong> sulla schermata Home: funziona a tutto schermo e anche <strong>offline sul set</strong></li>
+        </ol>
+      </div>
+      <div class="step-card">
+        <h3>🍎 iPhone (Safari)</h3>
+        <ol>
+          <li>Inquadra il QR Code con la Fotocamera per aprirlo in <strong>Safari</strong></li>
+          <li>Tocca il tasto <strong>Condividi</strong> (quadrato con freccia in su) in basso</li>
+          <li>Scorri e tocca <strong>«Aggiungi alla schermata Home»</strong>, poi aprila dall'icona <strong>Marker</strong></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Compact ISO/IEC 18004 QR Code SVG Generator (Offline, Byte mode, ECC L, V1-V6) */
+function makeQRSvg(text){
+  const bytes=new TextEncoder().encode(text);
+  const V=[null,[19,7,1,[]],[34,10,1,[6,18]],[55,15,1,[6,22]],[80,20,1,[6,26]],[108,26,1,[6,30]],[136,18,2,[6,34]]];
+  let ver=1;while(ver<6&&bytes.length>V[ver][0]-2)ver++;
+  if(bytes.length>V[ver][0]-2)return '<svg viewBox="0 0 100 100"><text x="8" y="52" font-size="7">Link troppo lungo (max 134 car.)</text></svg>';
+  const [dataCap,ecLen,numBlocks,align]=V[ver],N=17+4*ver;
+  const EXP=new Uint8Array(512),LOG=new Uint8Array(256);
+  for(let i=0,x=1;i<255;i++){EXP[i]=EXP[i+255]=x;LOG[x]=i;x=(x<<1)^(x&128?0x11d:0)}
+  const rs=(d,ec)=>{let g=[1];for(let i=0;i<ec;i++){const n=new Uint8Array(g.length+1);
+    for(let j=0;j<g.length;j++){n[j]^=g[j];n[j+1]^=g[j]?EXP[LOG[g[j]]+i]:0}g=n}
+    const r=new Uint8Array(ec);for(const b of d){const f=b^r[0];r.copyWithin(0,1);r[ec-1]=0;
+      if(f)for(let j=0;j<ec;j++)r[j]^=EXP[LOG[g[j+1]]+LOG[f]]}return r};
+  const bits=[];const pb=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>i)&1)};
+  pb(4,4);pb(bytes.length,8);for(const b of bytes)pb(b,8);
+  pb(0,Math.min(4,dataCap*8-bits.length));while(bits.length%8)bits.push(0);
+  const data=new Uint8Array(dataCap);
+  for(let i=0;i<bits.length/8;i++){let v=0;for(let j=0;j<8;j++)v=(v<<1)|bits[i*8+j];data[i]=v}
+  for(let i=bits.length/8,p=0;i<dataCap;i++,p^=1)data[i]=p?0x11:0xec;
+  const dpb=dataCap/numBlocks,dB=[],eB=[],cw=[];
+  for(let b=0;b<numBlocks;b++){const s=data.slice(b*dpb,(b+1)*dpb);dB.push(s);eB.push(rs(s,ecLen))}
+  for(let i=0;i<dpb;i++)for(let b=0;b<numBlocks;b++)cw.push(dB[b][i]);
+  for(let i=0;i<ecLen;i++)for(let b=0;b<numBlocks;b++)cw.push(eB[b][i]);
+  const mat=Array.from({length:N},()=>new Uint8Array(N)),res=Array.from({length:N},()=>new Uint8Array(N));
+  for(const [fr,fc] of [[0,0],[0,N-7],[N-7,0]])for(let dr=-1;dr<=7;dr++)for(let dc=-1;dc<=7;dc++){
+    const r=fr+dr,c=fc+dc;if(r>=0&&r<N&&c>=0&&c<N){res[r][c]=1;
+      mat[r][c]=(dr>=0&&dr<=6&&dc>=0&&dc<=6&&(dr===0||dr===6||dc===0||dc===6||(dr>=2&&dr<=4&&dc>=2&&dc<=4)))?1:0}}
+  for(const ar of align)for(const ac of align)if(!res[ar][ac])for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){
+    res[ar+dr][ac+dc]=1;mat[ar+dr][ac+dc]=Math.max(Math.abs(dr),Math.abs(dc))!==1?1:0}
+  for(let i=8;i<N-8;i++){if(!res[6][i]){res[6][i]=1;mat[6][i]=i%2===0?1:0}if(!res[i][6]){res[i][6]=1;mat[i][6]=i%2===0?1:0}}
+  for(let i=0;i<=8;i++){res[8][i]=1;res[i][8]=1}for(let i=0;i<8;i++){res[8][N-1-i]=1;res[N-1-i][8]=1}
+  mat[N-8][8]=1;res[N-8][8]=1;
+  let bi=0,up=true;
+  for(let right=N-1;right>=1;right-=2){if(right===6)right=5;
+    for(let v=0;v<N;v++){const r=up?N-1-v:v;for(const c of [right,right-1])if(!res[r][c]){
+      const bit=bi<cw.length*8?((cw[bi>>3]>>(7-(bi&7)))&1):0;bi++;mat[r][c]=((r+c)%2===0)?(bit^1):bit}}up=!up}
+  const fmt=0x77c4;
+  const tlC=[0,1,2,3,4,5,7,8],tlR=[7,5,4,3,2,1,0];
+  for(let i=0;i<8;i++)mat[8][tlC[i]]=(fmt>>(14-i))&1;
+  for(let i=0;i<7;i++)mat[tlR[i]][8]=(fmt>>(6-i))&1;
+  for(let i=0;i<7;i++)mat[N-1-i][8]=(fmt>>(14-i))&1;
+  for(let i=0;i<8;i++)mat[8][N-8+i]=(fmt>>(7-i))&1;
+  let path='';for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(mat[r][c])path+=`M${c+2},${r+2}h1v1h-1z`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${N+4} ${N+4}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="${path}" fill="#000"/></svg>`;
+}
+
+const input=document.getElementById('urlInput');
+const qrContainer=document.getElementById('qrContainer');
+const qrText=document.getElementById('qrText');
+const localWarn=document.getElementById('localWarn');
+
+function defaultUrl(){
+  if(location.protocol.startsWith('http')){
+    const base=location.href.split('?')[0].split('#')[0].replace(/qrcode\.html$/,'').replace(/index\.html$/,'');
+    return base+(base.endsWith('/')?'':'/')+'?install=1';
+  }
+  return localStorage.getItem('oam-public-url')||'https://onair-marker-phone.netlify.app/?install=1';
+}
+
+function updateQR(){
+  let u=input.value.trim()||defaultUrl();
+  if(u&&!u.includes('?install=1')&&u.startsWith('http')&&!u.includes('?')){
+    // keep clean or add ?install=1 if user wants
+  }
+  if(!location.protocol.startsWith('http')&&input.value.trim()){
+    try{localStorage.setItem('oam-public-url',u)}catch(e){}
+  }
+  qrContainer.innerHTML=makeQRSvg(u);
+  qrText.textContent=u;
+  const isPlaceholder=!location.protocol.startsWith('http')&&(u.includes('tuonome.github.io')||u.includes('onairmilano.tv/marker'));
+  localWarn.style.display=(!u.startsWith('https://')||isPlaceholder)?'block':'none';
+}
+
+input.value=defaultUrl();
+input.addEventListener('input',updateQR);
+updateQR();
+
+document.getElementById('btnCopyUrl').onclick=async()=>{
+  try{await navigator.clipboard.writeText(input.value.trim());document.getElementById('btnCopyUrl').textContent='✓ Copiato!';
+    setTimeout(()=>document.getElementById('btnCopyUrl').textContent='Copia link',1800)}catch(e){}
+};
+
+document.getElementById('btnDownloadPng').onclick=()=>{
+  const svgEl=qrContainer.querySelector('svg');
+  if(!svgEl)return;
+  const svgData=new XMLSerializer().serializeToString(svgEl);
+  const img=new Image();
+  const blob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  img.onload=()=>{
+    const canvas=document.createElement('canvas');
+    canvas.width=1024;canvas.height=1024;
+    const ctx=canvas.getContext('2d');
+    ctx.imageSmoothingEnabled=false;
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,1024,1024);
+    ctx.drawImage(img,0,0,1024,1024);
+    URL.revokeObjectURL(url);
+    const a=document.createElement('a');
+    a.download='onair-marker-qrcode.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+  };
+  img.src=url;
+};
+</script>
+</body>
+</html>

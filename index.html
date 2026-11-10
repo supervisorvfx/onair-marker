@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>On Air Marker</title>
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Marker">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#111; --panel:#1c1c1e; --line:#2c2c2e; --text:#f2f2f7; --muted:#8e8e93; --accent:#ff3b30;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  overscroll-behavior:none}
+button,input,select,a{font:inherit;color:inherit}
+.hidden{display:none!important}
+
+/* ---------- SETTINGS ---------- */
+#setup{min-height:100%;padding:calc(16px + var(--sat)) calc(16px + var(--sar)) calc(110px + var(--sab)) calc(16px + var(--sal));max-width:560px;margin:0 auto}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.topbar-actions{display:flex;gap:8px;flex-shrink:0;margin-top:4px}
+.chip-btn{border:1px solid #3a3a3c;background:var(--panel);color:var(--text);border-radius:10px;padding:8px 11px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.chip-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+h1{font-size:22px;margin:4px 0 2px}
+.sub{color:var(--muted);font-size:13px;margin:0}
+
+/* ---------- INSTALL BANNER & MODAL ---------- */
+#installBanner{background:linear-gradient(145deg,#261818,#1c1c1e);border:1.5px solid rgba(255,59,48,.55);border-radius:16px;padding:15px;margin:0 0 16px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.ib-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ib-head img{width:46px;height:46px;border-radius:11px;flex-shrink:0}
+.ib-head h3{margin:0;font-size:16px}
+.ib-head p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.ib-steps{background:rgba(0,0,0,.4);border-radius:11px;padding:11px 12px;font-size:13.5px;line-height:1.5;margin:10px 0}
+.ib-steps ol{margin:0;padding-left:18px}
+.ib-steps li{margin:4px 0}
+.ib-actions{display:flex;gap:8px;margin-top:10px}
+.ib-actions .btn-main{flex:1;background:var(--accent);color:#fff;border:0;border-radius:11px;padding:12px;font-weight:700;font-size:15px;cursor:pointer}
+.ib-actions .btn-sec{background:#2c2c2e;color:var(--muted);border:0;border-radius:11px;padding:12px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.ico-inline{display:inline-block;vertical-align:middle;width:16px;height:16px;margin:0 2px}
+
+.modal-backdrop{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px}
+.modal-card{background:var(--panel);border:1px solid #3a3a3c;border-radius:20px;padding:20px;max-width:380px;width:100%;text-align:center;box-shadow:0 16px 50px rgba(0,0,0,.6)}
+.modal-card h3{margin:0 0 6px;font-size:18px}
+.modal-card p{margin:0 0 14px;font-size:13px;color:var(--muted)}
+#qrBox{background:#fff;padding:14px;border-radius:16px;display:inline-block;margin:0 auto 12px}
+#qrBox svg{display:block;width:220px;height:220px}
+.qr-url{font-size:11.5px;color:var(--muted);word-break:break-all;background:#000;padding:8px 10px;border-radius:8px;margin-bottom:12px;user-select:all}
+.card{background:var(--panel);border-radius:14px;padding:14px;margin:12px 0}
+.card h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.seg{display:flex;background:#000;border-radius:10px;padding:3px;gap:3px;flex-wrap:nowrap}
+.seg button{flex:1 1 0;min-width:0;border:0;background:transparent;padding:9px 4px;border-radius:8px;font-size:13px;white-space:nowrap;cursor:pointer}
+.seg button.on{background:#3a3a3c;font-weight:600}
+.seg.icon-seg button{display:flex;align-items:center;justify-content:center;padding:10px 6px;min-width:52px}
+.seg.icon-seg svg{width:30px;height:30px;display:block;pointer-events:none}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row label{flex:1}
+.row output{min-width:44px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{width:55%;accent-color:var(--accent)}
+input[type=number]{width:64px;background:#000;border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sw{width:38px;height:38px;border-radius:50%;border:2px solid #3a3a3c;padding:0}
+.sw.on{outline:3px solid var(--accent);outline-offset:2px}
+.sw-custom{position:relative;overflow:hidden;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)}
+.sw-custom input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:13px;background:#2c2c2e;font-weight:600;text-align:center}
+.file{position:relative;overflow:hidden}
+.file input{position:absolute;inset:0;opacity:0}
+.thumb{display:flex;gap:10px;align-items:center;margin-top:10px;color:var(--muted);font-size:13px}
+.thumb img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px}
+.toggle{appearance:none;width:50px;height:30px;border-radius:15px;background:#3a3a3c;position:relative;transition:.2s;flex:none}
+.toggle:checked{background:#34c759}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s}
+.toggle:checked::after{left:22px}
+.note{color:var(--muted);font-size:12.5px;margin-top:8px}
+#preview{height:min(360px,55vh);aspect-ratio:9/19.5;border-radius:18px;border:2px solid #3a3a3c;position:relative;overflow:hidden;margin:0 auto}
+#startBar{position:fixed;left:0;right:0;bottom:0;padding:12px calc(16px + var(--sar)) calc(12px + var(--sab)) calc(16px + var(--sal));
+  background:linear-gradient(transparent,rgba(0,0,0,.92) 30%)}
+#start{max-width:560px;margin:0 auto;background:var(--accent);color:#fff;font-size:17px;padding:16px}
+
+/* ---------- DISPLAY ---------- */
+#display{position:fixed;inset:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.stage{position:absolute;inset:0}
+.mk{position:absolute;transform:translate(-50%,-50%)}
+.mk svg,.mk img{display:block;width:100%;height:100%}
+.full{position:absolute;inset:0;width:100%;height:100%}
+#shield{position:fixed;inset:0;z-index:10;touch-action:none}
+#toolbar{position:fixed;left:50%;bottom:calc(24px + var(--sab));transform:translateX(-50%);z-index:20;display:flex;gap:8px;
+  background:rgba(28,28,30,.92);padding:8px;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.4)}
+#toolbar button{border:0;background:#3a3a3c;color:#fff;border-radius:10px;padding:12px 16px;font-weight:600;white-space:nowrap}
+#toolbar .lock{background:var(--accent)}
+#hint{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;background:rgba(0,0,0,.82);color:#fff;
+  padding:14px 18px;border-radius:14px;text-align:center;font-size:14px;max-width:80vw;pointer-events:none;transition:opacity .4s}
+#ring{position:fixed;z-index:40;width:84px;height:84px;pointer-events:none;transform:translate(-50%,-50%)}
+#ring circle{fill:none;stroke-width:6}
+</style>
+</head>
+<body>
+
+<!-- ===================== SETUP ===================== -->
+<main id="setup">
+  <div class="topbar">
+    <div>
+      <h1>On Air Marker</h1>
+      <div class="sub">Tracking marker a schermo intero per VFX</div>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="chip-btn primary hidden" id="btnTopInstall">📲 Installa</button>
+      <button type="button" class="chip-btn" id="btnShowQR" title="Mostra QR Code per installare su altri telefoni">📱 Mostra QR</button>
+    </div>
+  </div>
+
+  <!-- BANNER INSTALLAZIONE AUTOMATICO (visibile quando aperto da QR Code / browser) -->
+  <div id="installBanner" class="hidden">
+    <div class="ib-head">
+      <img src="icon-192.png" alt="Icona Marker">
+      <div>
+        <h3>Installa On Air Marker</h3>
+        <p>Trasforma questa pagina in un'app a schermo intero (anche offline)</p>
+      </div>
+    </div>
+    <div id="ibStepsIOS" class="ib-steps hidden">
+      <ol>
+        <li>Tocca il tasto <strong>Condividi</strong> <svg class="ico-inline" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2.2"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></svg> nella barra di Safari</li>
+        <li>Scorri e scegli <strong>«Aggiungi alla schermata Home»</strong> ➕</li>
+        <li>Tocca <strong>Aggiungi</strong> in alto a destra e aprila dall'icona <strong>Marker</strong></li>
+      </ol>
+    </div>
+    <div id="ibStepsAndroid" class="ib-steps hidden">
+      Tocca il pulsante qui sotto per installare l'app, oppure apri il menu del browser <strong>⋮</strong> in alto a destra e scegli <strong>«Installa app»</strong> (o <em>Aggiungi a schermata Home</em>).
+    </div>
+    <div class="ib-actions">
+      <button type="button" class="btn-main hidden" id="btnInstallNow">📲 Installa App ora</button>
+      <button type="button" class="btn-sec" id="btnDismissInstall">Usa nel browser</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Contenuto</h2>
+    <div class="seg" data-key="mode">
+      <button data-v="markers">Marker</button>
+      <button data-v="image">Immagine</button>
+      <button data-v="overlay">Overlay</button>
+    </div>
+  </div>
+
+  <!-- TIPO DI MARKER (con icone grafiche, prima dell'anteprima) -->
+  <div class="card" id="shapeCard">
+    <h2>Tipo di marker</h2>
+    <div class="seg icon-seg" data-key="shape">
+      <button data-v="quad" title="Quadranti" aria-label="Quadranti">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#fff"/><path d="M50 50 L50 6 A44 44 0 0 1 94 50 Z M50 50 L50 94 A44 44 0 0 1 6 50 Z" fill="#111"/><circle cx="50" cy="50" r="42" fill="none" stroke="#fff" stroke-width="6"/></svg>
+      </button>
+      <button data-v="plus" title="Croce +" aria-label="Croce +">
+        <svg viewBox="0 0 100 100"><rect x="41" y="10" width="18" height="80" rx="2" fill="currentColor"/><rect x="10" y="41" width="80" height="18" rx="2" fill="currentColor"/></svg>
+      </button>
+      <button data-v="x" title="Croce ×" aria-label="Croce ×">
+        <svg viewBox="0 0 100 100"><g transform="rotate(45 50 50)"><rect x="41" y="6" width="18" height="88" rx="2" fill="currentColor"/><rect x="6" y="41" width="88" height="18" rx="2" fill="currentColor"/></g></svg>
+      </button>
+      <button data-v="dot" title="Punto" aria-label="Punto">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="currentColor"/><circle cx="50" cy="50" r="14" fill="#111"/></svg>
+      </button>
+      <button data-v="custom" title="Personalizzato (carica file)" aria-label="Personalizzato">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="18" width="72" height="64" rx="10"/><circle cx="36" cy="40" r="7" fill="currentColor" stroke="none"/><path d="M16 70l22-20 16 14 14-12 18 18"/></svg>
+      </button>
+    </div>
+    <div id="customBox" class="hidden" style="margin-top:12px">
+      <div class="btn file">Carica marker (PNG/SVG/JPG)<input type="file" id="customFile" accept="image/*"></div>
+      <div class="thumb" id="customThumb"></div>
+    </div>
+    <div class="row" style="margin-top:6px"><label for="invert">Inverti colori marker</label><input type="checkbox" class="toggle" id="invert"></div>
+  </div>
+
+  <div id="preview"></div>
+
+  <!-- OVERLAY OPTIONS -->
+  <div id="overlayOpts" class="card hidden">
+    <h2>Sovraimpressione (Overlay)</h2>
+    <div class="row">
+      <label>Opacità sovraimpressione</label>
+      <input type="range" id="opacity" min="5" max="100">
+      <output id="opacityOut"></output>
+    </div>
+    <div class="row">
+      <label>Opacità sfondo colore</label>
+      <input type="range" id="bgOpacity" min="0" max="100">
+      <output id="bgOpacityOut"></output>
+    </div>
+    <div style="margin-top:10px">
+      <div class="btn file">📱 Carica schermata telefono sotto (Screenshot)<input type="file" id="screenFile" accept="image/*"></div>
+      <div class="thumb" id="screenThumb"></div>
+      <div class="note">Fai uno screenshot della schermata del telefono che vuoi vedere sotto e caricalo qui: vedrai lo schermo sotto e i marker/sfondo dell'app sopra con l'opacità scelta.</div>
+    </div>
+  </div>
+
+  <!-- MARKER OPTIONS -->
+  <div id="markerOpts">
+    <div class="card">
+      <h2>Disposizione</h2>
+      <div class="seg" data-key="layout">
+        <button data-v="center" title="Centro">Centro</button>
+        <button data-v="corners" title="4 angoli">Angoli</button>
+        <button data-v="corners5" title="4 angoli + centro">5 Punti</button>
+        <button data-v="top" title="Riga in alto">Alto</button>
+        <button data-v="bottom" title="Riga in basso">Basso</button>
+        <button data-v="grid" title="Griglia">Griglia</button>
+      </div>
+      <div class="row" id="rowCount"><label>Quantità</label><input type="number" id="count" min="1" max="8"></div>
+      <div class="row" id="rowGrid"><label>Righe × colonne</label>
+        <span><input type="number" id="rows" min="1" max="10"> × <input type="number" id="cols" min="1" max="8"></span></div>
+      <div class="row"><label>Dimensione</label><input type="range" id="size" min="5" max="90"><output id="sizeOut"></output></div>
+      <div class="row"><label>Distanza dai bordi</label><input type="range" id="margin" min="0" max="30"><output id="marginOut"></output></div>
+      <div class="row"><label>Spessore croce / bordo</label><input type="range" id="stroke" min="2" max="25"><output id="strokeOut"></output></div>
+    </div>
+
+    <div class="card">
+      <h2>Colore marker</h2>
+      <div class="swatches" data-key="fg"></div>
+    </div>
+  </div>
+
+  <!-- IMAGE OPTIONS -->
+  <div id="imageOpts" class="card hidden">
+    <h2>Immagine dalla galleria</h2>
+    <div class="btn file">Scegli immagine<input type="file" id="imgFile" accept="image/*"></div>
+    <div class="thumb" id="imgThumb"></div>
+    <div class="seg" data-key="fit" style="margin-top:12px">
+      <button data-v="cover">Riempi schermo</button>
+      <button data-v="contain">Intera</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Colore di sfondo</h2>
+    <div class="swatches" data-key="bg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Blocco</h2>
+    <div class="row"><label for="autoLock">Blocca i tocchi all'avvio</label><input type="checkbox" class="toggle" id="autoLock"></div>
+    <div class="row"><label>Angolo per sbloccare<br><span class="note">tieni premuto 3 secondi</span></label>
+      <select id="unlockCorner" style="background:#000;border:1px solid var(--line);border-radius:8px;padding:6px">
+        <option value="tl">In alto a sinistra</option><option value="tr">In alto a destra</option>
+        <option value="bl">In basso a sinistra</option><option value="br">In basso a destra</option>
+      </select></div>
+    <div class="note">Lo schermo resta sempre acceso. Luminosità: alzala al massimo prima di avviare
+      (vedi guida per l'automazione). Notifiche/chiamate: attiva “Non disturbare” (o la Focus automatica su iPhone).</div>
+  </div>
+</main>
+<div id="startBar"><button class="btn" id="start">Avvia</button></div>
+
+<!-- ===================== DISPLAY ===================== -->
+<div id="display" class="hidden">
+  <div class="stage" id="stage"></div>
+  <div id="shield" class="hidden"></div>
+  <div id="toolbar" class="hidden">
+    <button id="tbSettings">Impostazioni</button>
+    <button id="tbLock" class="lock">Blocca</button>
+  </div>
+  <div id="hint" class="hidden"></div>
+  <svg id="ring" class="hidden" viewBox="0 0 84 84"><circle cx="42" cy="42" r="36" stroke="rgba(128,128,128,.35)"/>
+    <circle id="ringFg" cx="42" cy="42" r="36" stroke="#ff3b30" stroke-dasharray="226.2" stroke-dashoffset="226.2" transform="rotate(-90 42 42)"/></svg>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+const DEF={mode:'markers',shape:'quad',layout:'corners',count:2,rows:3,cols:2,size:28,margin:6,stroke:8,
+  fg:'#000000',bg:'#ffffff',invert:false,fit:'cover',opacity:55,bgOpacity:40,autoLock:true,unlockCorner:'tl'};
+let S={...DEF};
+try{Object.assign(S,JSON.parse(localStorage.getItem('oam-settings')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('oam-settings',JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const BG=[['#ffffff','Bianco'],['#000000','Nero'],['#777777','Grigio 18%'],['#00b140','Green screen'],['#0047bb','Blue screen']];
+const FG=[['#000000','Nero'],['#ffffff','Bianco'],['#ff00ff','Magenta'],['#00a838','Verde scuro'],['#ffeb00','Giallo']];
+
+/* ---------------- tiny IndexedDB for images ---------------- */
+const idb=(()=>{let p;const db=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('oam',1);
+  r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+  const tx=(m,fn)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction('f',m);const q=fn(t.objectStore('f'));
+    t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}));
+  return{get:k=>tx('readonly',s=>s.get(k)).catch(()=>null),set:(k,v)=>tx('readwrite',s=>s.put(v,k)).catch(()=>null)}})();
+let imgURL=null, customURL=null, screenURL=null;
+const setBlobURL=(blob,which)=>{if(!blob)return;const u=URL.createObjectURL(blob);
+  if(which==='img'){if(imgURL)URL.revokeObjectURL(imgURL);imgURL=u}
+  else if(which==='screen'){if(screenURL)URL.revokeObjectURL(screenURL);screenURL=u}
+  else{if(customURL)URL.revokeObjectURL(customURL);customURL=u}};
+
+/* ---------------- marker SVGs ---------------- */
+function markerSVG(shape,fg,bg,strokePct,invert){
+  const a=invert?bg:fg, b=invert?fg:bg, sw=strokePct; // sw in viewBox units (0-100)
+  if(shape==='quad'){
+    const ring=Math.max(1.2,sw*0.25);
+    return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${b}"/>
+      <path d="M50 50 L50 0 A50 50 0 0 1 100 50 Z M50 50 L50 100 A50 50 0 0 1 0 50 Z" fill="${a}"/>
+      <circle cx="50" cy="50" r="${50-ring/2}" fill="none" stroke="${a}" stroke-width="${ring}"/></svg>`;
+  }
+  if(shape==='plus') return `<svg viewBox="0 0 100 100"><rect x="${50-sw/2}" y="0" width="${sw}" height="100" fill="${a}"/>
+      <rect x="0" y="${50-sw/2}" width="100" height="${sw}" fill="${a}"/></svg>`;
+  if(shape==='x') return `<svg viewBox="0 0 100 100"><g transform="rotate(45 50 50)"><rect x="${50-sw/2}" y="-15" width="${sw}" height="130" fill="${a}"/>
+      <rect x="-15" y="${50-sw/2}" width="130" height="${sw}" fill="${a}"/></g></svg>`;
+  if(shape==='dot') return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${a}"/><circle cx="50" cy="50" r="${Math.max(3,sw*0.6)}" fill="${b}"/></svg>`;
+  return '';
+}
+
+/* ---------------- layout ---------------- */
+function positions(W,H,d,m){
+  const L=m+d/2, R=W-m-d/2, T=m+d/2, B=H-m-d/2, cx=W/2, cy=H/2;
+  const spread=(a,b,n)=>n===1?[(a+b)/2]:Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+  switch(S.layout){
+    case 'center': return [[cx,cy]];
+    case 'corners': return [[L,T],[R,T],[L,B],[R,B]];
+    case 'corners5': return [[L,T],[R,T],[cx,cy],[L,B],[R,B]];
+    case 'top': return spread(L,R,S.count).map(x=>[x,T]);
+    case 'bottom': return spread(L,R,S.count).map(x=>[x,B]);
+    case 'grid': {const out=[];for(const y of spread(T,B,S.rows))for(const x of spread(L,R,S.cols))out.push([x,y]);return out}
+  }
+  return [];
+}
+function mockPhoneScreenSVG(){
+  return `<svg class="full" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="wp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e3c72"/><stop offset="50%" stop-color="#2a5298"/><stop offset="100%" stop-color="#141e30"/></linearGradient></defs>
+    <rect width="390" height="844" fill="url(#wp)"/>
+    <text x="195" y="135" fill="rgba(255,255,255,.85)" font-size="56" font-weight="300" text-anchor="middle" font-family="sans-serif">09:41</text>
+    <g transform="translate(32,210)">
+      <rect x="0" y="0" width="64" height="64" rx="15" fill="#34c759"/><rect x="86" y="0" width="64" height="64" rx="15" fill="#0a84ff"/>
+      <rect x="172" y="0" width="64" height="64" rx="15" fill="#ff9f0a"/><rect x="258" y="0" width="64" height="64" rx="15" fill="#ff375f"/>
+      <rect x="0" y="96" width="64" height="64" rx="15" fill="#5e5ce6"/><rect x="86" y="96" width="64" height="64" rx="15" fill="#30b0c7"/>
+      <rect x="172" y="96" width="64" height="64" rx="15" fill="#ffd60a"/><rect x="258" y="96" width="64" height="64" rx="15" fill="#bf5af2"/>
+      <rect x="0" y="196" width="322" height="120" rx="22" fill="rgba(255,255,255,.16)"/>
+      <rect x="20" y="220" width="160" height="14" rx="7" fill="rgba(255,255,255,.6)"/>
+      <rect x="20" y="248" width="240" height="12" rx="6" fill="rgba(255,255,255,.35)"/>
+      <rect x="20" y="272" width="190" height="12" rx="6" fill="rgba(255,255,255,.35)"/>
+    </g>
+    <rect x="24" y="730" width="342" height="84" rx="28" fill="rgba(255,255,255,.2)"/>
+  </svg>`;
+}
+
+function render(stage,W,H,ins){
+  stage.innerHTML='';
+  if(S.mode==='image'){
+    stage.style.background=S.bg;
+    if(imgURL){const im=document.createElement('img');im.src=imgURL;im.className='full';im.style.objectFit=S.fit;im.draggable=false;stage.appendChild(im)}
+    return;
+  }
+  let targetContainer=stage;
+  if(S.mode==='overlay'){
+    stage.style.background='#000';
+    // 1. Schermo del telefono sotto (screenshot caricato o simulazione schermata Home)
+    if(screenURL){
+      const bgIm=document.createElement('img');bgIm.src=screenURL;bgIm.className='full';bgIm.style.objectFit='cover';bgIm.draggable=false;stage.appendChild(bgIm);
+    }else{
+      const mock=document.createElement('div');mock.className='full';mock.innerHTML=mockPhoneScreenSVG();stage.appendChild(mock);
+    }
+    // 2. Livello app sopra con opacità regolabile
+    const ov=document.createElement('div');ov.className='full';
+    ov.style.opacity=(S.opacity/100).toFixed(2);
+    const bgTint=document.createElement('div');bgTint.className='full';
+    bgTint.style.background=S.bg;bgTint.style.opacity=(S.bgOpacity/100).toFixed(2);
+    ov.appendChild(bgTint);
+    if(imgURL){
+      const oIm=document.createElement('img');oIm.src=imgURL;oIm.className='full';oIm.style.objectFit=S.fit;oIm.draggable=false;ov.appendChild(oIm);
+    }
+    stage.appendChild(ov);
+    targetContainer=ov;
+  }else{
+    stage.style.background=S.bg;
+  }
+  const base=Math.min(W,H), d=base*S.size/100, m=base*S.margin/100;
+  const innerW=W-ins.l-ins.r, innerH=H-ins.t-ins.b;
+  const pts=positions(innerW,innerH,d,m);
+  const fgBg = S.fg.toLowerCase()==='#ffffff' ? '#000000' : '#ffffff';
+  const html = S.shape==='custom' ? (customURL?`<img src="${customURL}" draggable="false">`:'') :
+    markerSVG(S.shape,S.fg,fgBg,S.stroke,S.invert);
+  for(const [x,y] of pts){const el=document.createElement('div');el.className='mk';
+    el.style.cssText=`left:${x+ins.l}px;top:${y+ins.t}px;width:${d}px;height:${d}px`;el.innerHTML=html;targetContainer.appendChild(el)}
+}
+function insets(){const p=document.createElement('div');
+  p.style.cssText='position:fixed;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);visibility:hidden';
+  document.body.appendChild(p);const cs=getComputedStyle(p);
+  const r={t:parseFloat(cs.paddingTop)||0,r:parseFloat(cs.paddingRight)||0,b:parseFloat(cs.paddingBottom)||0,l:parseFloat(cs.paddingLeft)||0};p.remove();return r}
+
+/* ---------------- setup UI ---------------- */
+function buildSwatches(){
+  for(const [key,list] of [['bg',BG],['fg',FG]]){
+    const box=document.querySelector(`.swatches[data-key=${key}]`);box.innerHTML='';
+    for(const [c,name] of list){const b=document.createElement('button');b.className='sw';b.style.background=c;b.title=name;b.dataset.v=c;
+      b.onclick=()=>{S[key]=c;sync()};box.appendChild(b)}
+    const cu=document.createElement('label');cu.className='sw sw-custom';cu.title='Personalizzato';
+    cu.innerHTML=`<input type="color">`;const inp=cu.querySelector('input');
+    inp.oninput=()=>{S[key]=inp.value;sync()};box.appendChild(cu);
+  }
+}
+document.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;S[seg.dataset.key]=b.dataset.v;sync()}));
+for(const id of ['count','rows','cols','size','margin','stroke','opacity','bgOpacity'])$(id).addEventListener('input',e=>{
+  let v=parseInt(e.target.value,10);if(isNaN(v))return;v=Math.max(+e.target.min,Math.min(+e.target.max,v));S[id]=v;sync(false)});
+$('invert').onchange=e=>{S.invert=e.target.checked;sync()};
+$('autoLock').onchange=e=>{S.autoLock=e.target.checked;sync()};
+$('unlockCorner').onchange=e=>{S.unlockCorner=e.target.value;sync()};
+$('imgFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;await idb.set('img',f);setBlobURL(f,'img');sync()};
+$('customFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;await idb.set('custom',f);setBlobURL(f,'custom');sync()};
+$('screenFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;await idb.set('screen',f);setBlobURL(f,'screen');sync()};
+
+function sync(updateInputs=true){
+  save();
+  document.querySelectorAll('.seg').forEach(seg=>seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',S[seg.dataset.key]===b.dataset.v)));
+  document.querySelectorAll('.swatches').forEach(box=>{let hit=false;box.querySelectorAll('.sw[data-v]').forEach(b=>{const on=b.dataset.v.toLowerCase()===S[box.dataset.key].toLowerCase();b.classList.toggle('on',on);hit=hit||on});
+    const cu=box.querySelector('.sw-custom');cu.classList.toggle('on',!hit);if(!hit)cu.style.background=S[box.dataset.key];else cu.style.background='';});
+  if(updateInputs)for(const id of ['count','rows','cols','size','margin','stroke','opacity','bgOpacity'])$(id).value=S[id];
+  $('sizeOut').textContent=S.size+'%';$('marginOut').textContent=S.margin+'%';$('strokeOut').textContent=S.stroke;
+  $('opacityOut').textContent=S.opacity+'%';$('bgOpacityOut').textContent=S.bgOpacity+'%';
+  $('invert').checked=S.invert;$('autoLock').checked=S.autoLock;$('unlockCorner').value=S.unlockCorner;
+  const hasMarkers=(S.mode==='markers'||S.mode==='overlay');
+  $('shapeCard').classList.toggle('hidden',!hasMarkers);
+  $('markerOpts').classList.toggle('hidden',!hasMarkers);
+  $('overlayOpts').classList.toggle('hidden',S.mode!=='overlay');
+  $('imageOpts').classList.toggle('hidden',S.mode!=='image');
+  $('customBox').classList.toggle('hidden',S.shape!=='custom');
+  $('rowCount').classList.toggle('hidden',S.layout!=='top'&&S.layout!=='bottom');$('rowGrid').classList.toggle('hidden',S.layout!=='grid');
+  $('imgThumb').innerHTML=imgURL?`<img src="${imgURL}"> Immagine salvata sul telefono`:'Nessuna immagine scelta';
+  $('customThumb').innerHTML=customURL?`<img src="${customURL}"> Marker personalizzato salvato`:'Nessun marker caricato';
+  $('screenThumb').innerHTML=screenURL?`<img src="${screenURL}"> Schermata telefono salvata`:'Nessuno screenshot caricato (usa schermata di esempio)';
+  // preview: simulate a phone 390x844
+  const pv=$('preview'),w=pv.clientWidth||180,h=pv.clientHeight||390;
+  let st=pv.querySelector('.stage');if(!st){st=document.createElement('div');st.className='stage';pv.appendChild(st)}
+  const k=w/390;render(st,w,h,{t:47*k,r:0,b:34*k,l:0});
+}
+
+/* ---------------- display + lock ---------------- */
+let wakeLock=null, locked=false;
+/* anti stand-by: Wake Lock API + fallback video muto in loop (iOS/Android vecchi) */
+let nsVideo=null;
+function videoFallback(){try{if(!nsVideo){nsVideo=document.createElement('video');
+  nsVideo.setAttribute('playsinline','');nsVideo.setAttribute('muted','');nsVideo.muted=true;nsVideo.loop=true;
+  nsVideo.style.cssText='position:fixed;width:1px;height:1px;opacity:0.01;pointer-events:none;left:0;top:0';
+  nsVideo.src='data:video/mp4;base64,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bWU9MSB0cmVsbGlzPTAgOHg4ZGN0PTAgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9MCB0aHJlYWRzPTEgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0wIHdlaWdodHA9MCBrZXlpbnQ9MjUwIGtleWludF9taW49MSBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTEwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAA5liIQFv///D0UAAU9/gAEYIAcBGCAHARggBwEYIAcBGCAHARggBwEYIAcBGCAHAAAABUGaIBX1ARggBwEYIAcBGCAHARggBwEYIAcBGCAHARggBwEYIAc=';document.body.appendChild(nsVideo)}
+  const p=nsVideo.play();p&&p.catch(()=>{})}catch(e){}}
+async function keepAwake(){let ok=false;
+  try{if('wakeLock' in navigator){wakeLock=await navigator.wakeLock.request('screen');ok=true}}catch(e){}
+  if(!ok)videoFallback();}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!$('display').classList.contains('hidden'))keepAwake()});
+
+function showHint(t,ms=2500){const h=$('hint');h.innerHTML=t;h.classList.remove('hidden');h.style.opacity=1;
+  clearTimeout(showHint.t);showHint.t=setTimeout(()=>{h.style.opacity=0;setTimeout(()=>h.classList.add('hidden'),400)},ms)}
+const cornerName={tl:'in alto a sinistra',tr:'in alto a destra',bl:'in basso a sinistra',br:'in basso a destra'};
+
+function drawDisplay(){render($('stage'),window.innerWidth,window.innerHeight,insets())}
+async function start(){
+  if(S.mode==='image'&&!imgURL){alert('Scegli prima un\'immagine dalla galleria.');return}
+  if(S.mode==='markers'&&S.shape==='custom'&&!customURL){alert('Carica prima il marker personalizzato.');return}
+  $('setup').classList.add('hidden');$('startBar').classList.add('hidden');$('display').classList.remove('hidden');
+  try{const el=document.documentElement;if(el.requestFullscreen&&!document.fullscreenElement)await el.requestFullscreen({navigationUI:'hide'})}catch(e){}
+  try{screen.orientation&&screen.orientation.lock&&await screen.orientation.lock(screen.orientation.type)}catch(e){}
+  keepAwake();drawDisplay();
+  if(S.autoLock)lock();else showHint('Tocca lo schermo per il menu');
+}
+function exitDisplay(){unlock(true);$('display').classList.add('hidden');$('setup').classList.remove('hidden');$('startBar').classList.remove('hidden');
+  try{wakeLock&&wakeLock.release();wakeLock=null}catch(e){}
+  try{nsVideo&&nsVideo.pause()}catch(e){}
+  try{document.fullscreenElement&&document.exitFullscreen()}catch(e){}
+  sync()}
+function lock(){locked=true;$('toolbar').classList.add('hidden');$('shield').classList.remove('hidden');
+  showHint(`Bloccato<br><small>Per sbloccare tieni premuto 3 s<br>l'angolo ${cornerName[S.unlockCorner]}</small>`,3000)}
+function unlock(silent){locked=false;$('shield').classList.add('hidden');if(!silent){$('toolbar').classList.remove('hidden');showHint('Sbloccato',1200)}}
+
+$('start').onclick=start;
+$('tbSettings').onclick=exitDisplay;
+$('tbLock').onclick=e=>{e.stopPropagation();lock()};
+$('display').addEventListener('click',e=>{if(locked||e.target.closest('#toolbar'))return;$('toolbar').classList.toggle('hidden')});
+window.addEventListener('resize',()=>{if(!$('display').classList.contains('hidden'))drawDisplay();else sync(false)});
+
+/* shield: swallow every touch; long-press in chosen corner unlocks */
+(function(){
+  const sh=$('shield'),ring=$('ring'),fg=$('ringFg'),HOLD=3000,ZONE=110;let t0=0,raf=0,active=false;
+  const inCorner=(x,y)=>{const W=innerWidth,H=innerHeight,c=S.unlockCorner;
+    return (c[1]==='l'?x<ZONE:x>W-ZONE)&&(c[0]==='t'?y<ZONE:y>H-ZONE)};
+  const stop=()=>{active=false;cancelAnimationFrame(raf);ring.classList.add('hidden');fg.style.strokeDashoffset=226.2};
+  const tick=()=>{const p=Math.min(1,(performance.now()-t0)/HOLD);fg.style.strokeDashoffset=226.2*(1-p);
+    if(p>=1){stop();unlock();return}raf=requestAnimationFrame(tick)};
+  const kill=e=>{e.preventDefault();e.stopPropagation()};
+  sh.addEventListener('touchstart',e=>{kill(e);if(e.touches.length!==1){stop();return}
+    const t=e.touches[0];if(inCorner(t.clientX,t.clientY)){active=true;t0=performance.now();
+      ring.style.left=t.clientX+'px';ring.style.top=t.clientY+'px';
+      setTimeout(()=>{if(active){ring.classList.remove('hidden');}},400);raf=requestAnimationFrame(tick)}},{passive:false});
+  sh.addEventListener('touchmove',e=>{kill(e);const t=e.touches[0];if(active&&t&&!inCorner(t.clientX,t.clientY))stop()},{passive:false});
+  sh.addEventListener('touchend',e=>{kill(e);stop()},{passive:false});
+  sh.addEventListener('touchcancel',stop);
+  // mouse (desktop testing)
+  sh.addEventListener('mousedown',e=>{kill(e);if(inCorner(e.clientX,e.clientY)){active=true;t0=performance.now();ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';ring.classList.remove('hidden');raf=requestAnimationFrame(tick)}});
+  sh.addEventListener('mouseup',e=>{kill(e);stop()});
+  sh.addEventListener('click',kill);
+  for(const ev of ['contextmenu','gesturestart','gesturechange','dblclick','wheel'])document.addEventListener(ev,e=>{if(!$('display').classList.contains('hidden'))e.preventDefault()},{passive:false});
+})();
+
+/* ---------------- install & QR code ---------------- */
+let deferredPrompt=null;
+const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
+const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+
+function updateInstallUI(forceOpen=false){
+  if(isStandalone()){
+    $('installBanner').classList.add('hidden');
+    $('btnTopInstall').classList.add('hidden');
+    return;
+  }
+  $('btnTopInstall').classList.remove('hidden');
+  const dismissed=sessionStorage.getItem('oam-ib-dismissed')==='1';
+  const fromQR=new URLSearchParams(location.search).get('install')==='1';
+  if(forceOpen||fromQR||!dismissed){
+    $('installBanner').classList.remove('hidden');
+  }
+  if(isIOS()){
+    $('ibStepsIOS').classList.remove('hidden');
+    $('ibStepsAndroid').classList.add('hidden');
+    $('btnInstallNow').classList.add('hidden');
+  }else{
+    $('ibStepsIOS').classList.add('hidden');
+    $('ibStepsAndroid').classList.remove('hidden');
+    $('btnInstallNow').classList.toggle('hidden',!deferredPrompt);
+  }
+}
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  updateInstallUI();
+});
+window.addEventListener('appinstalled',()=>{
+  deferredPrompt=null;
+  $('installBanner').classList.add('hidden');
+  $('btnTopInstall').classList.add('hidden');
+});
+
+$('btnInstallNow').onclick=async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  const {outcome}=await deferredPrompt.userChoice;
+  if(outcome==='accepted')deferredPrompt=null;
+  updateInstallUI();
+};
+$('btnTopInstall').onclick=()=>{
+  if(deferredPrompt){$('btnInstallNow').click();}
+  else{sessionStorage.removeItem('oam-ib-dismissed');updateInstallUI(true);window.scrollTo({top:0,behavior:'smooth'});}
+};
+$('btnDismissInstall').onclick=()=>{
+  sessionStorage.setItem('oam-ib-dismissed','1');
+  $('installBanner').classList.add('hidden');
+};
+
+/* Compact ISO/IEC 18004 QR Code SVG Generator (Offline, Byte mode, ECC L, V1-V6) */
+function makeQRSvg(text){
+  const bytes=new TextEncoder().encode(text);
+  const V=[null,[19,7,1,[]],[34,10,1,[6,18]],[55,15,1,[6,22]],[80,20,1,[6,26]],[108,26,1,[6,30]],[136,18,2,[6,34]]];
+  let ver=1;while(ver<6&&bytes.length>V[ver][0]-2)ver++;
+  if(bytes.length>V[ver][0]-2)return '<svg viewBox="0 0 100 100"><text x="10" y="50" font-size="8">URL troppo lungo</text></svg>';
+  const [dataCap,ecLen,numBlocks,align]=V[ver],N=17+4*ver;
+  const EXP=new Uint8Array(512),LOG=new Uint8Array(256);
+  for(let i=0,x=1;i<255;i++){EXP[i]=EXP[i+255]=x;LOG[x]=i;x=(x<<1)^(x&128?0x11d:0)}
+  const rs=(d,ec)=>{let g=[1];for(let i=0;i<ec;i++){const n=new Uint8Array(g.length+1);
+    for(let j=0;j<g.length;j++){n[j]^=g[j];n[j+1]^=g[j]?EXP[LOG[g[j]]+i]:0}g=n}
+    const r=new Uint8Array(ec);for(const b of d){const f=b^r[0];r.copyWithin(0,1);r[ec-1]=0;
+      if(f)for(let j=0;j<ec;j++)r[j]^=EXP[LOG[g[j+1]]+LOG[f]]}return r};
+  const bits=[];const pb=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>i)&1)};
+  pb(4,4);pb(bytes.length,8);for(const b of bytes)pb(b,8);
+  pb(0,Math.min(4,dataCap*8-bits.length));while(bits.length%8)bits.push(0);
+  const data=new Uint8Array(dataCap);
+  for(let i=0;i<bits.length/8;i++){let v=0;for(let j=0;j<8;j++)v=(v<<1)|bits[i*8+j];data[i]=v}
+  for(let i=bits.length/8,p=0;i<dataCap;i++,p^=1)data[i]=p?0x11:0xec;
+  const dpb=dataCap/numBlocks,dB=[],eB=[],cw=[];
+  for(let b=0;b<numBlocks;b++){const s=data.slice(b*dpb,(b+1)*dpb);dB.push(s);eB.push(rs(s,ecLen))}
+  for(let i=0;i<dpb;i++)for(let b=0;b<numBlocks;b++)cw.push(dB[b][i]);
+  for(let i=0;i<ecLen;i++)for(let b=0;b<numBlocks;b++)cw.push(eB[b][i]);
+  const mat=Array.from({length:N},()=>new Uint8Array(N)),res=Array.from({length:N},()=>new Uint8Array(N));
+  for(const [fr,fc] of [[0,0],[0,N-7],[N-7,0]])for(let dr=-1;dr<=7;dr++)for(let dc=-1;dc<=7;dc++){
+    const r=fr+dr,c=fc+dc;if(r>=0&&r<N&&c>=0&&c<N){res[r][c]=1;
+      mat[r][c]=(dr>=0&&dr<=6&&dc>=0&&dc<=6&&(dr===0||dr===6||dc===0||dc===6||(dr>=2&&dr<=4&&dc>=2&&dc<=4)))?1:0}}
+  for(const ar of align)for(const ac of align)if(!res[ar][ac])for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){
+    res[ar+dr][ac+dc]=1;mat[ar+dr][ac+dc]=Math.max(Math.abs(dr),Math.abs(dc))!==1?1:0}
+  for(let i=8;i<N-8;i++){if(!res[6][i]){res[6][i]=1;mat[6][i]=i%2===0?1:0}if(!res[i][6]){res[i][6]=1;mat[i][6]=i%2===0?1:0}}
+  for(let i=0;i<=8;i++){res[8][i]=1;res[i][8]=1}for(let i=0;i<8;i++){res[8][N-1-i]=1;res[N-1-i][8]=1}
+  mat[N-8][8]=1;res[N-8][8]=1;
+  let bi=0,up=true;
+  for(let right=N-1;right>=1;right-=2){if(right===6)right=5;
+    for(let v=0;v<N;v++){const r=up?N-1-v:v;for(const c of [right,right-1])if(!res[r][c]){
+      const bit=bi<cw.length*8?((cw[bi>>3]>>(7-(bi&7)))&1):0;bi++;mat[r][c]=((r+c)%2===0)?(bit^1):bit}}up=!up}
+  const fmt=0x77c4; // ECC L (01) + Mask 0 (000) -> 0b01000 BCH & ^0x5412 = 0x77c4
+  const tlC=[0,1,2,3,4,5,7,8],tlR=[7,5,4,3,2,1,0];
+  for(let i=0;i<8;i++)mat[8][tlC[i]]=(fmt>>(14-i))&1;
+  for(let i=0;i<7;i++)mat[tlR[i]][8]=(fmt>>(6-i))&1;
+  for(let i=0;i<7;i++)mat[N-1-i][8]=(fmt>>(14-i))&1;
+  for(let i=0;i<8;i++)mat[8][N-8+i]=(fmt>>(7-i))&1;
+  let path='';for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(mat[r][c])path+=`M${c+2},${r+2}h1v1h-1z`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${N+4} ${N+4}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="${path}" fill="#000"/></svg>`;
+}
+
+/* ---------------- boot ---------------- */
+buildSwatches();
+Promise.all([idb.get('img'),idb.get('custom'),idb.get('screen')]).then(([a,b,c])=>{setBlobURL(a,'img');setBlobURL(b,'custom');setBlobURL(c,'screen');sync()});
+sync();
+updateInstallUI();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+
+<!-- ===================== QR CODE MODAL ===================== -->
+<div id="qrModal" class="modal-backdrop hidden">
+  <div class="modal-card">
+    <h3>Inquadra per installare</h3>
+    <p>Fai inquadrare questo schermo dall'altro telefono per installare <strong>On Air Marker</strong></p>
+    <div id="qrBox"></div>
+    <div id="qrUrlText" class="qr-url"></div>
+    <div style="text-align:left;background:rgba(0,0,0,.35);border-radius:10px;padding:9px 11px;font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.4">
+      📡 <strong style="color:var(--text)">Telefono di scena senza SIM/rete?</strong><br>
+      Attiva per 10 secondi l'<strong>Hotspot</strong> del tuo telefono per fargli aprire il QR Code la prima volta. Una volta installata, l'app funziona <strong>100% offline / Modalità Aereo</strong>!
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="qrcode.html" class="btn" style="flex:1;text-decoration:none;color:#fff;font-size:13.5px;padding:11px;background:#2c2c2e">Scheda A4</a>
+      <button type="button" class="btn" id="btnCloseQR" style="flex:1;background:var(--accent);color:#fff;font-size:13.5px;padding:11px;cursor:pointer">Chiudi</button>
+    </div>
+  </div>
+</div>
+<script>
+const openQRModal=()=>{
+  const base=location.href.split('?')[0].split('#')[0].replace(/index\.html$/,'');
+  const target=location.protocol.startsWith('http')?(base+(base.endsWith('/')?'':'/')+'?install=1'):'https://onair-marker-phone.netlify.app/?install=1';
+  $('qrBox').innerHTML=makeQRSvg(target);
+  $('qrUrlText').textContent=target;
+  $('qrModal').classList.remove('hidden');
+};
+$('btnShowQR').onclick=openQRModal;
+$('btnCloseQR').onclick=()=>$('qrModal').classList.add('hidden');
+$('qrModal').addEventListener('click',e=>{if(e.target===$('qrModal'))$('qrModal').classList.add('hidden')});
+/* Se aperto da PC / Desktop (non da telefono), mostra subito il QR Code da inquadrare */
+const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+if(!isMobile&&new URLSearchParams(location.search).get('install')!=='1')openQRModal();
+</script>
+</body>
+</html>
